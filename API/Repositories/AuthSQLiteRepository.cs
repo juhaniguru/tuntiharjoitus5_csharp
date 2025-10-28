@@ -13,7 +13,7 @@ namespace API.Repositories
     // tässä on ensimmäinen ongelma! Arkkitehtuurissa samalla tasolla olevat riippuvuudet riippuvat toisistaan
     // ÄLÄ KOSKAAN rakenna sovelluksen arkkitehtuuria niin, että data kulkee saman kerroksen sisällä sivuttain
     
-    public class AuthSQLiteRepository(SqliteConnection _connection, ILogRepo _logRepo) : IAuthRepo
+    public class AuthSQLiteRepository(SqliteConnection _connection) : IAuthRepo
     {
         public async Task<AppUser?> Login(string username, string password)
         {
@@ -49,33 +49,10 @@ namespace API.Repositories
                 Username = reader.GetString(3),
                 Password = reader.GetString(4)
             };
-            // jos käyttäjä löytyy, verrataan salasanoja
             
 
-            // tämä rikkoo SRP:tä (Single Responsibility Principleä).
-            // Repositorio-layerin tehtävä ei ole hoitaa businesslogiikaa, vaan toimia data access layerina
-            // toisin sanoen: salasanan tarkistus ei ole data access layerin tehtävä
-            if (password != user.Password)
-            {
-                return null;
-            }
 
-            // jos käyttäjä löytyy ja salasana on oikein,
-            // lisätään rivi logs-tauluun, josta näkee, 
-            // milloin käyttäjä on viimeksi kirjautunut sisään
-
-
-            // TÄMÄ EI SAA OLLA TÄÄLLÄ
-            // REPOSITORYSTA EI SAA TEHDÄ KUTSUA TOISEEN REPOSITORIOON
-            // KOSKA REPOSITORIOT OVAT ARKKITEHTUURISSA SAMALLA SOVELLUSKERROKSELLA
-
-            // LISÄKSI TÄMÄ RIKKOO SRP:TÄ. NYT YKSI REPOSITORION METODI ON VASTUUSSA USEAMMASTA ASIASTA
-
-            await _logRepo.Create(new AddLogEntryReq
-            {
-                UserName = user.Username
-            });
-
+            
 
             return user;
         }

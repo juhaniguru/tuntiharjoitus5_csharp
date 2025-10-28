@@ -12,7 +12,7 @@ namespace API.Controllers
 {
     [ApiController]
     [Route("api/[controller]")]
-    public class AuthController(IAuthRepo _authRepo) : ControllerBase
+    public class AuthController(IAuthRepo _authRepo, ILogRepo _logRepo) : ControllerBase
     {
         
 
@@ -29,6 +29,20 @@ namespace API.Controllers
                     Message = "user not found"
                 });
             }
+
+            if (request.Password != user.Password)
+            {
+                return NotFound(new
+                {
+                    Message = "user not found"
+                });
+            }
+
+
+            await _logRepo.Create(new AddLogEntryReq
+            {
+                UserName = user.Username
+            });
 
             return new LoginRes
             {
