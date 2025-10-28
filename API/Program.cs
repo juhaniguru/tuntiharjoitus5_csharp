@@ -1,5 +1,6 @@
 using API.Interfaces;
 using API.Repositories;
+using API.Services;
 using Microsoft.Data.Sqlite;
 
 var builder = WebApplication.CreateBuilder(args);
@@ -20,6 +21,8 @@ builder.Services.AddScoped<SqliteConnection>(provider =>
 
 builder.Services.AddScoped<IAuthRepo, AuthSQLiteRepository>();
 builder.Services.AddScoped<ILogRepo, LogSQLiteRepository>();
+builder.Services.AddScoped<IAuthService, AuthService>();
+
 
 builder.Services.AddControllers();
 // Learn more about configuring OpenAPI at https://aka.ms/aspnet/openapi

@@ -12,7 +12,7 @@ namespace API.Controllers
 {
     [ApiController]
     [Route("api/[controller]")]
-    public class AuthController(IAuthRepo _authRepo, ILogRepo _logRepo) : ControllerBase
+    public class AuthController(IAuthService _authService) : ControllerBase
     {
         
 
@@ -21,33 +21,14 @@ namespace API.Controllers
         {
             // nopeasti katsottuna koodi näyttää olevan kunnossa, mutta controllerissa kaikki onkin paikallaan
             // ongelma on authRepossa (AuthSQLiteRepository)
-            var user = await _authRepo.Login(request.UserName, request.Password);
-            if (user == null)
+            try
             {
-                return NotFound(new
-                {
-                    Message = "user not found"
-                });
+                var res = await _authService.Login(request);
+                return Ok(res);
+            } catch(Exception e)
+            {
+                return Problem(title: "Error logging user in", detail: e.Message, statusCode: 500);
             }
-
-            if (request.Password != user.Password)
-            {
-                return NotFound(new
-                {
-                    Message = "user not found"
-                });
-            }
-
-
-            await _logRepo.Create(new AddLogEntryReq
-            {
-                UserName = user.Username
-            });
-
-            return new LoginRes
-            {
-                Token = "jwt"
-            };
 
 
 
